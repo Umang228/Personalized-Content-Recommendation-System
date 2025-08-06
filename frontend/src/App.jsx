@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Container, AppBar, Toolbar, Typography, Tabs, Tab, Box, Alert } from '@mui/material';
-import { motion } from 'framer-motion';
-import UserSelector from './components/UserSelector';
-import MovieList from './components/MovieList';
-import ClusterDisplay from './components/ClusterDisplay';
+import React, { useState, useEffect } from "react";
+import UserSelector from "./components/UserSelector";
+import MovieList from "./components/MovieList";
+import ClusterDisplay from "./components/ClusterDisplay";
 
 function App() {
   const [users, setUsers] = useState([]);
@@ -16,104 +14,89 @@ function App() {
   const usersPerPage = 20;
 
   useEffect(() => {
-    fetch('http://127.0.0.1:5000/api/users')
-      .then(response => response.json())
-      .then(data => setUsers(data))
-      .catch(error => {
-        console.error('Error fetching users:', error);
-        setError('Failed to load users. Please try again later.');
+    fetch("http://127.0.0.1:5000/api/users")
+      .then((res) => res.json())
+      .then(setUsers)
+      .catch((err) => {
+        console.error("Error fetching users:", err);
+        setError("Failed to load users. Please try again later.");
       });
-    
-    fetch('http://127.0.0.1:5000/api/clusters')
-      .then(response => {
-        if (!response.ok) throw new Error('Failed to fetch clusters');
-        return response.json();
+
+    fetch("http://127.0.0.1:5000/api/clusters")
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch clusters");
+        return res.json();
       })
-      .then(data => setClusters(data))
-      .catch(error => {
-        console.error('Error fetching clusters:', error);
-        setError('Failed to load clusters. Please try again later.');
+      .then(setClusters)
+      .catch((err) => {
+        console.error("Error fetching clusters:", err);
+        setError("Failed to load clusters. Please try again later.");
       });
   }, []);
 
   useEffect(() => {
-    if (selectedUser) {
-      fetch(`http://127.0.0.1:5000/api/recommend/${selectedUser}`)
-        .then(response => {
-          if (!response.ok) throw new Error('Failed to fetch recommendations');
-          return response.json();
-        })
-        .then(data => setRecommendations(data))
-        .catch(error => {
-          console.error('Error fetching recommendations:', error);
-          setError('Failed to load recommendations. Please try again later.');
-        });
-    } else {
+    if (!selectedUser) {
       setRecommendations([]);
+      return;
     }
+    fetch(`http://127.0.0.1:5000/api/recommend/${selectedUser}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch recommendations");
+        return res.json();
+      })
+      .then(setRecommendations)
+      .catch((err) => {
+        console.error("Error fetching recommendations:", err);
+        setError("Failed to load recommendations. Please try again later.");
+      });
   }, [selectedUser]);
 
   const paginatedUsers = users.slice(0, page * usersPerPage);
 
   return (
-    <Box sx={{ minHeight: '100vh', width: '100vw', boxSizing: 'border-box' }}>
-      <AppBar
-        position="sticky"
-        sx={{
-          background: 'linear-gradient(90deg, rgba(75,0,130,0.9) 0%, rgba(30,144,255,0.9) 100%)',
-          backdropFilter: 'blur(10px)',
-          boxShadow: '0 4px 6px rgba(0,0,0,0.2)',
-        }}
-      >
-        <Toolbar sx={{ justifyContent: 'center' }}>
-          <Typography
-            variant="h4"
-            component="h1"
-            sx={{
-              fontWeight: 700,
-              textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
-              fontSize: { xs: '1.5rem', sm: '2rem' },
-            }}
-          >
+    <div className="min-h-screen w-full flex flex-col bg-gradient-to-r from-primaryGradientStart to-primaryGradientEnd text-gray-900">
+      <header className="sticky top-0 bg-white bg-opacity-90 backdrop-blur-md shadow-md z-30">
+        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <h1 className="text-3xl font-extrabold text-indigo-700 drop-shadow-sm select-none">
             MovieLens Explorer
-          </Typography>
-        </Toolbar>
-        <Tabs
-          value={tab}
-          onChange={(e, newValue) => setTab(newValue)}
-          centered
-          sx={{
-            bgcolor: 'transparent',
-            '& .MuiTab-root': {
-              color: 'rgba(255,255,255,0.7)',
-              fontWeight: 500,
-              fontSize: { xs: '0.9rem', sm: '1rem' },
-            },
-            '& .Mui-selected': {
-              color: '#FF6F61',
-              fontWeight: 700,
-            },
-            '& .MuiTabs-indicator': {
-              backgroundColor: '#FF6F61',
-            },
-          }}
-        >
-          <Tab label="Recommendations" />
-          <Tab label="User Clusters" />
-        </Tabs>
-      </AppBar>
-      <Container maxWidth="lg" sx={{ py: { xs: 3, sm: 5 } }}>
+          </h1>
+          <div className="flex space-x-4">
+            <button
+              onClick={() => setTab(0)}
+              className={`px-4 py-2 rounded-md font-semibold transition ${
+                tab === 0
+                  ? "bg-gradient-to-r from-accentGradientStart to-accentGradientEnd text-white shadow-lg"
+                  : "text-indigo-500 hover:text-indigo-700"
+              }`}
+              aria-current={tab === 0 ? "page" : undefined}
+              type="button"
+            >
+              Recommendations
+            </button>
+            <button
+              onClick={() => setTab(1)}
+              className={`px-4 py-2 rounded-md font-semibold transition ${
+                tab === 1
+                  ? "bg-gradient-to-r from-accentGradientStart to-accentGradientEnd text-white shadow-lg"
+                  : "text-indigo-500 hover:text-indigo-700"
+              }`}
+              aria-current={tab === 1 ? "page" : undefined}
+              type="button"
+            >
+              User Clusters
+            </button>
+          </div>
+        </nav>
+      </header>
+      <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
+          <div className="mb-6 bg-red-100 border border-red-300 text-red-700 rounded-md p-4">
             {error}
-          </Alert>
+          </div>
         )}
+
         {tab === 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
+          <section className="space-y-12">
             <UserSelector
               users={paginatedUsers}
               onSelect={setSelectedUser}
@@ -122,19 +105,19 @@ function App() {
               hasMore={page * usersPerPage < users.length}
             />
             <MovieList recommendations={recommendations} selectedUser={selectedUser} />
-          </motion.div>
+          </section>
         )}
+
         {tab === 1 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
+          <section>
             <ClusterDisplay clusters={clusters} />
-          </motion.div>
+          </section>
         )}
-      </Container>
-    </Box>
+      </main>
+      <footer className="text-center py-6 bg-white bg-opacity-90 text-indigo-600 font-medium select-none">
+        &copy; {new Date().getFullYear()} MovieLens Explorer
+      </footer>
+    </div>
   );
 }
 

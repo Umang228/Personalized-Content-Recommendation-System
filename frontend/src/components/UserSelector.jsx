@@ -1,93 +1,50 @@
-import React from 'react';
-import { Autocomplete, TextField, Box, Typography, Button } from '@mui/material';
-import { motion } from 'framer-motion';
+import React from "react";
 
-function UserSelector({ users, onSelect, selectedUser, onLoadMore, hasMore }) {
-  const selectedUserData = users.find(user => user.user_id === selectedUser);
+export default function UserSelector({ users, onSelect, selectedUser, onLoadMore, hasMore }) {
+  const selectedUserData = users.find((user) => user.user_id === selectedUser);
 
   return (
-    <Box sx={{ mb: 4, px: { xs: 1, sm: 0 } }}>
-      <Typography
-        variant="h5"
-        sx={{
-          mb: 3,
-          fontWeight: 700,
-          textAlign: 'center',
-          color: '#FFF',
-          textShadow: '1px 1px 3px rgba(0,0,0,0.4)',
-          fontSize: { xs: '1.25rem', sm: '1.75rem' },
-        }}
-      >
+    <section className="max-w-3xl mx-auto mb-10 px-4 select-none">
+      <h2 className="text-3xl font-extrabold text-indigo-700 text-center mb-6">
         Select a User
-      </Typography>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+      </h2>
+
+      <select
+        className="w-full p-3 border border-indigo-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+        onChange={(e) => {
+          const value = e.target.value;
+          onSelect(value === "" ? null : Number(value));
+        }}
+        value={selectedUser ?? ""}
+        aria-label="Select a user"
       >
-        <Autocomplete
-          options={users}
-          getOptionLabel={(user) =>
-            `User ${user.user_id} (${user.age}, ${user.gender}, ${user.occupation})`
-          }
-          onChange={(event, newValue) => onSelect(newValue ? newValue.user_id : null)}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Search Users"
-              variant="outlined"
-              sx={{
-                bgcolor: 'rgba(255,255,255,0.1)',
-                borderRadius: '10px',
-                '& .MuiOutlinedInput-root': {
-                  color: '#FFF',
-                  '& fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
-                  '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.5)' },
-                  '&.Mui-focused fieldset': { borderColor: '#FF6F61' },
-                },
-                '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' },
-                '& .MuiInputLabel-root.Mui-focused': { color: '#FF6F61' },
-                '& .MuiAutocomplete-option': { color: '#FFF' },
-              }}
-            />
-          )}
-          sx={{ maxWidth: { xs: '100%', sm: '600px' }, mx: 'auto' }}
-          popupIcon={<Box component="span" sx={{ color: 'rgba(255,255,255,0.7)' }}>▼</Box>}
-        />
-      </motion.div>
+        <option value="" disabled>
+          -- Select User --
+        </option>
+        {users.map((user) => (
+          <option key={user.user_id} value={user.user_id}>
+            User {user.user_id} ({user.age}, {user.gender}, {user.occupation})
+          </option>
+        ))}
+      </select>
+
       {selectedUserData && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          sx={{ mt: 2, textAlign: 'center' }}
-        >
-          <Typography sx={{ color: 'rgba(255,255,255,0.9)', fontSize: { xs: '0.9rem', sm: '1rem' } }}>
-            Selected: User {selectedUserData.user_id} ({selectedUserData.age}, {selectedUserData.gender}, {selectedUserData.occupation})
-          </Typography>
-        </motion.div>
+        <p className="mt-4 text-indigo-600 text-center font-medium">
+          Selected: User {selectedUserData.user_id} ({selectedUserData.age},{" "}
+          {selectedUserData.gender}, {selectedUserData.occupation})
+        </p>
       )}
+
       {hasMore && (
-        <Box sx={{ textAlign: 'center', mt: 3 }}>
-          <Button
-            variant="contained"
+        <div className="mt-8 text-center">
+          <button
             onClick={onLoadMore}
-            sx={{
-              background: 'linear-gradient(45deg, #FF6F61, #DE1D1D)',
-              color: '#FFF',
-              fontWeight: 600,
-              borderRadius: '8px',
-              px: 3,
-              py: 1,
-              '&:hover': { background: 'linear-gradient(45deg, #FF8A80, #F44336)' },
-            }}
+            className="px-6 py-2 bg-gradient-to-r from-accentGradientStart to-accentGradientEnd text-white rounded-lg font-semibold shadow-md hover:from-accentGradientEnd hover:to-accentGradientStart transition"
           >
             Load More Users
-          </Button>
-        </Box>
+          </button>
+        </div>
       )}
-    </Box>
+    </section>
   );
 }
-
-export default UserSelector;
