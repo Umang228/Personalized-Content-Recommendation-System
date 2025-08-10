@@ -1,42 +1,55 @@
 import React from 'react';
 import { Box, Typography, Card, CardContent, Grid } from '@mui/material';
 import { motion } from 'framer-motion';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer
+} from 'recharts';
 
-// Helper for safe number rendering
-function safeFixed(val, places = 2, fallback = 'N/A') {
-  return (typeof val === "number" && isFinite(val)) ? val.toFixed(places) : fallback;
+// Returns formatted number or 0 if NaN/null/undefined
+function safeFixed(val, places = 2) {
+  return typeof val === 'number' && isFinite(val) ? val.toFixed(places) : '0';
 }
 
-// Converts gender ratio (0.11) to percent string "11.00"
-function safePercent(val, places = 2, fallback = 'N/A') {
-  return (typeof val === "number" && isFinite(val)) ? (val * 100).toFixed(places) : fallback;
+// Returns percentage string or "0" if NaN/null/undefined
+function safePercent(val, places = 2) {
+  if (typeof val === 'number' && isFinite(val)) {
+    return (val * 100).toFixed(places);
+  }
+  return '0';
 }
 
 function ClusterDisplay({ clusters }) {
   return (
     <Box sx={{ mt: 4 }}>
-      <Typography
-        variant="h5"
-        sx={{
-          mb: 3,
-          fontWeight: 700,
-          textAlign: 'center',
-          color: '#FFF',
-          textShadow: '1px 1px 3px rgba(0,0,0,0.4)',
-          fontSize: { xs: '1.25rem', sm: '1.75rem' },
-        }}
-      >
-        User Clusters
-      </Typography>
-      {(!clusters || clusters.length === 0) ? (
-        <Typography sx={{ color: 'rgba(255,255,255,0.7)', textAlign: 'center', fontSize: { xs: '1rem', sm: '1.2rem' } }}>
+
+      {!clusters || clusters.length === 0 ? (
+        <Typography
+          sx={{
+            color: '#777',
+            textAlign: 'center',
+            fontSize: { xs: '1rem', sm: '1.2rem' }
+          }}
+        >
           Loading cluster data...
         </Typography>
       ) : (
-        <Grid container spacing={2}>
+        <Grid container spacing={3} direction="column">
           {clusters.map((cluster, index) => (
-            <Grid item xs={12} sm={6} md={4} key={cluster.cluster ?? index}>
+            <Grid
+              item
+              xs={12}
+              key={cluster.cluster ?? index}
+              sx={{
+                display: 'block',
+                width: '100%',
+              }}
+            >
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -45,61 +58,81 @@ function ClusterDisplay({ clusters }) {
               >
                 <Card
                   sx={{
-                    bgcolor: 'rgba(255,255,255,0.08)',
-                    borderRadius: '12px',
-                    backdropFilter: 'blur(8px)',
-                    color: '#FFF',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                    bgcolor: '#fff',
+                    borderRadius: 3,
+                    boxShadow: '0 6px 20px rgba(94,96,206,0.08)',
+                    color: '#222',
+                    p: 2,
+                    border: '1px solid #e0e0e0',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%',
                   }}
                 >
-                  <CardContent sx={{ p: { xs: 1.5, sm: 2 } }}>
-                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                      Cluster {cluster.cluster ?? 'N/A'}
+                  <CardContent sx={{ p: 0 }}>
+                    <Typography
+                      variant="h6"
+                      sx={{ fontWeight: 700, mb: 2, color: '#7209b7' }}
+                    >
+                      Cluster {(typeof cluster.cluster === 'number' ? cluster.cluster + 1 : 'N/A')}
                     </Typography>
-                    <Typography sx={{ fontSize: { xs: '0.9rem', sm: '1rem' }, mb: 1 }}>
-                      Users: {cluster.num_users ?? 'N/A'}
+
+                    <Typography sx={{ fontSize: '0.95rem', mb: 1 }}>
+                      <strong>Users:</strong> {cluster.num_users ?? '0'}
                     </Typography>
-                    <Typography sx={{ fontSize: { xs: '0.9rem', sm: '1rem' }, mb: 1 }}>
-                      Avg. Age: {safeFixed(cluster.age_mean)} (Std: {safeFixed(cluster.age_std)})
+                    <Typography sx={{ fontSize: '0.95rem', mb: 1 }}>
+                      <strong>Avg. Age:</strong> {safeFixed(cluster.age_mean)} (Std: {safeFixed(cluster.age_std)})
                     </Typography>
-                    <Typography sx={{ fontSize: { xs: '0.9rem', sm: '1rem' }, mb: 1 }}>
-                      Gender: M ({safePercent(cluster.gender_dist?.M) ?? 'N/A'}%), F ({safePercent(cluster.gender_dist?.F) ?? 'N/A'}%)
+                    <Typography sx={{ fontSize: '0.95rem', mb: 1 }}>
+                      <strong>Gender:</strong> M ({safePercent(cluster.gender_dist?.M)}%), F ({safePercent(cluster.gender_dist?.F)}%)
                     </Typography>
-                    <Typography sx={{ fontSize: { xs: '0.9rem', sm: '1rem' }, mb: 2 }}>
-                      Top Occupations: {cluster.top_occupations && Object.keys(cluster.top_occupations).length > 0
+                    <Typography sx={{ fontSize: '0.95rem', mb: 2 }}>
+                      <strong>Top Occupations:</strong>{' '}
+                      {cluster.top_occupations && Object.keys(cluster.top_occupations).length > 0
                         ? Object.entries(cluster.top_occupations)
-                            .map(([occ, prob]) => `${occ} (${safePercent(prob, 1)}%)`)
+                            .map(
+                              ([occ, prob]) => `${occ} (${safePercent(prob, 1)}%)`
+                            )
                             .join(', ')
-                        : "N/A"}
+                        : '0%'}
                     </Typography>
-                    <Typography sx={{ fontSize: { xs: '0.9rem', sm: '1rem' }, mb: 1, fontWeight: 500 }}>
-                      Genre Preferences:
+
+                    <Typography sx={{ fontSize: '1rem', mb: 1, fontWeight: 600, color: '#5e60ce' }}>
+                      Genre Preferences
                     </Typography>
+
                     {Array.isArray(cluster.genre_preferences) && cluster.genre_preferences.length > 0 ? (
                       <ResponsiveContainer width="100%" height={200}>
-                        <BarChart data={cluster.genre_preferences} margin={{ top: 10, right: 10, left: 0, bottom: 20 }}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.2)" />
+                        <BarChart
+                          data={cluster.genre_preferences}
+                          margin={{ top: 10, right: 10, left: 0, bottom: 20 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                           <XAxis
                             dataKey="name"
-                            tick={{ fill: '#FFF', fontSize: 12 }}
+                            tick={{ fill: '#5e60ce', fontSize: 12, fontWeight: '600' }}
                             angle={45}
                             textAnchor="end"
                             interval={0}
                           />
-                          <YAxis tick={{ fill: '#FFF', fontSize: 12 }} domain={[0, 5]} />
+                          <YAxis
+                            tick={{ fill: '#5e60ce', fontSize: 12, fontWeight: '600' }}
+                            domain={[0, 5]}
+                          />
                           <Tooltip
                             contentStyle={{
-                              backgroundColor: 'rgba(0,0,0,0.8)',
-                              border: 'none',
-                              borderRadius: '8px',
-                              color: '#FFF',
+                              backgroundColor: '#fff',
+                              border: '1px solid #ddd',
+                              borderRadius: 8,
+                              color: '#222',
+                              fontWeight: '600',
                             }}
                           />
-                          <Bar dataKey="value" fill="#FF6F61" />
+                          <Bar dataKey="value" fill="#f72585" barSize={18} radius={[4, 4, 0, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
                     ) : (
-                      <Typography sx={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', mb: 1 }}>
+                      <Typography sx={{ color: '#999', fontSize: '0.95rem' }}>
                         No genre data available.
                       </Typography>
                     )}
