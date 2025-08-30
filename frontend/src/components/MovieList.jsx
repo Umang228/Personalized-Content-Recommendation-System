@@ -1,6 +1,5 @@
 import React from 'react';
-import { Box, Typography, Card, CardContent, Chip, LinearProgress, IconButton, Tooltip } from '@mui/material';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { Box, Typography, Card, CardContent, Chip, LinearProgress } from '@mui/material';
 import { motion } from 'framer-motion';
 
 // Genre color map for visual variety
@@ -78,14 +77,14 @@ function MovieList({ recommendations, selectedUser }) {
                     border: '1px solid #f0f0f0'
                   }}
                 >
-                  {/* Gradient genre banner with optional IMDb link */}
+                  {/* Gradient genre banner */}
                   <Box
                     sx={{
                       background: `linear-gradient(45deg, ${colors}, ${colors})`,
                       color: '#fff',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'space-between',
+                      justifyContent: 'center',
                       px: 2,
                       py: 1.2
                     }}
@@ -93,19 +92,6 @@ function MovieList({ recommendations, selectedUser }) {
                     <Typography sx={{ fontWeight: 600, fontSize: '0.95rem' }}>
                       {mainGenre}
                     </Typography>
-                    {movie.imdb_url && (
-                      <Tooltip title="View on IMDb">
-                        <IconButton
-                          size="small"
-                          href={movie.imdb_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          sx={{ color: '#fff' }}
-                        >
-                          <OpenInNewIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    )}
                   </Box>
 
                   <CardContent>

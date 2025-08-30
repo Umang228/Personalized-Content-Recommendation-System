@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import UserSelector from './components/UserSelector';
 import MovieList from './components/MovieList';
 import ClusterDisplay from './components/ClusterDisplay';
+import PopularMovies from './components/PopularMovies';
 
 function App() {
   const [users, setUsers] = useState([]);
@@ -81,6 +82,7 @@ function App() {
             }}
           >
             <Tab label="Recommendations" />
+            <Tab label="Popular Movies" />
             <Tab label="Clusters" />
           </Tabs>
         </Toolbar>
@@ -178,6 +180,26 @@ function App() {
         )}
 
         {tab === 1 && (
+          <Box
+            sx={{
+              bgcolor: '#fff',
+              borderRadius: 3,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+              p: { xs: 2, sm: 3 },
+              mb: 4,
+            }}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <PopularMovies />
+            </motion.div>
+          </Box>
+        )}
+
+        {tab === 2 && (
           <Box
             sx={{
               bgcolor: '#fff',
