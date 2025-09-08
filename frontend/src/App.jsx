@@ -17,12 +17,14 @@ function App() {
   const usersPerPage = 20;
 
   useEffect(() => {
-    fetch('http://127.0.0.1:5000/api/users')
+    const apiUrl = import.meta.env.VITE_API_URL;
+    
+    fetch(`${apiUrl}/api/users`)
       .then(res => res.json())
       .then(setUsers)
       .catch(() => setError('Failed to load users.'));
 
-    fetch('http://127.0.0.1:5000/api/clusters')
+    fetch(`${apiUrl}/api/clusters`)
       .then(res => res.ok ? res.json() : Promise.reject())
       .then(setClusters)
       .catch(() => setError('Failed to load clusters.'));
@@ -30,7 +32,8 @@ function App() {
 
   useEffect(() => {
     if (!selectedUser) return setRecommendations([]);
-    fetch(`http://127.0.0.1:5000/api/recommend/${selectedUser}`)
+    const apiUrl = import.meta.env.VITE_API_URL;
+    fetch(`${apiUrl}/api/recommend/${selectedUser}`)
       .then(res => res.ok ? res.json() : Promise.reject())
       .then(setRecommendations)
       .catch(() => setError('Failed to load recommendations.'));

@@ -46,7 +46,8 @@ function PopularMovies() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`http://127.0.0.1:5000/api/popular-movies?sort_by=${sortOption}&limit=20&min_ratings=20`);
+      const apiUrl = import.meta.env.VITE_API_URL;
+      const response = await fetch(`${apiUrl}/api/popular-movies?sort_by=${sortOption}&limit=20&min_ratings=20`);
       if (!response.ok) throw new Error('Failed to fetch popular movies');
       const data = await response.json();
       setMovies(data.movies);
