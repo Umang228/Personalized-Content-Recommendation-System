@@ -136,7 +136,4 @@ def get_popular_movies():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    host = os.environ.get('HOST', '0.0.0.0')
-    debug = os.environ.get('DEBUG', 'False').lower() == 'true'
-    app.run(debug=debug, host=host, port=port)
+    app.run(debug=True, port=5000)
